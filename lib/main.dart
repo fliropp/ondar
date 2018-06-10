@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import './router.dart';
-import './views/ondarMap.dart';
 
 void main() => runApp(new Ondar());
 
@@ -22,15 +21,6 @@ class Ondar extends StatelessWidget {
 class OndarFront extends StatefulWidget {
   OndarFront({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -38,66 +28,74 @@ class OndarFront extends StatefulWidget {
 }
 
 class _OndarState extends State<OndarFront> {
-  int _counter = 0;
+  String _currentPostId = null;
 
-  void _incrementCounter() {
+  void _setCurrentPost(String cpid) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _currentPostId = cpid;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      /*appBar: new AppBar(
-      ),*/
       body: new Center(
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            new Container(
-              decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: new AssetImage("assets/ondar.jpg"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: new Center(
-                  child: new Column(
-                    children: [
-                      ondarHeader(),
-                      ondarButtons(),
-                    ]
-                  ),
-                ),
-            ),
-            new Container(
-                decoration: new BoxDecoration(color: Colors.white70),
-                child:new Column(
-                    children: [
-                       ondarFrontPost('route #1'),
-                       ondarFrontPost('route #2'),
-                       ondarFrontPost('route #3'),
-
-                    ]
-                ),
-
-            ),
-
+            ondarTop(),
+            ondarBottom(),
           ],
         ),
       ),
-      /*floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.*/
     );
+  }
+
+  Widget ondarTop(){
+    return new Container(
+      decoration: new BoxDecoration(
+        image: new DecorationImage(
+          image: new AssetImage("assets/ondar.jpg"),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: new Center(
+        child: new Column(
+            children: [
+              ondarHeader(),
+              ondarButtons(),
+            ]
+        ),
+      ),
+    );
+  }
+
+  Widget ondarBottom() {
+    if(_currentPostId == 'post') {
+      return new Container(
+        decoration: new BoxDecoration(color: Colors.white70),
+        child:new Column(
+            children: [
+              ondarFrontPostFull('route #1 - full post'),
+
+            ]
+        ),
+
+      );
+    } else {
+      return new Container(
+        decoration: new BoxDecoration(color: Colors.white70),
+        child:new Column(
+            children: [
+              ondarFrontPost('route #1'),
+              ondarFrontPost('route #2'),
+              ondarFrontPost('route #3'),
+
+            ]
+        ),
+
+      );
+    }
   }
 
   Widget ondarHeader() {
@@ -145,8 +143,6 @@ class _OndarState extends State<OndarFront> {
     );
   }
 
-
-
   Widget ondarFrontPost(String txt) {
     return new Padding(
       padding: const EdgeInsets.all(15.0),
@@ -178,14 +174,65 @@ class _OndarState extends State<OndarFront> {
 
                 ),
               ),
+              new GestureDetector(
+                  onTap: (){_setCurrentPost('post');},
+                  child: new Container(
+                    margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
+                    child: new Text(txt, style: new TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22.0,
+                      color: Colors.blueGrey,
+                    ),)
+                ),
+              ),
+            ]
+        ),
+      ),
+    );
+  }
+
+  Widget ondarFrontPostFull(String txt) {
+    return new Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: new Container(
+        padding: new EdgeInsets.only(top: 10.0),
+        decoration: new BoxDecoration(
+            color: Colors.orangeAccent,
+            borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.3,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width * 0.8,
+        child: new Row(
+            children: [
               new Container(
-                  margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
-                  child: new Text(txt, style: new TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22.0,
-                    color: Colors.blueGrey,
-                  ),)
-              )
+                margin: new EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 10.0),
+                child: new IconTheme(
+                  data: new IconThemeData(
+                    color: null,
+                  ), //IconThemeData
+                  child: new ImageIcon(
+                      new AssetImage("assets/logo-mount.png"),
+                      color: null,
+                      size: 35.0), //Logo
+
+                ),
+              ),
+              new GestureDetector(
+                onTap: (){_setCurrentPost('list');},
+                child: new Container(
+                    margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
+                    child: new Text(txt, style: new TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22.0,
+                      color: Colors.blueGrey,
+                    ),)
+                ),
+              ),
             ]
         ),
       ),
