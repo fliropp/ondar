@@ -1,4 +1,4 @@
-package com.example.ondar1;
+package com.jaf.ondar1;
 
 import android.os.Bundle;
 

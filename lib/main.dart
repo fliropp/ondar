@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import './router.dart';
 
 void main() => runApp(new Ondar());
@@ -80,22 +82,34 @@ class _OndarState extends State<OndarFront> {
 
             ]
         ),
-
       );
     } else {
-      return new Container(
-        decoration: new BoxDecoration(color: Colors.white70),
-        child:new Column(
-            children: [
-              ondarFrontPost('route #1'),
-              ondarFrontPost('route #2'),
-              ondarFrontPost('route #3'),
-
-            ]
-        ),
-
-      );
+        //return new Container(
+        //    decoration: new BoxDecoration(color: Colors.white70),
+        //    child:multiplePosts(),
+        //);
+      return multiplePosts();
     }
+  }
+
+  Widget multiplePosts() {
+    return new StreamBuilder(
+          stream: Firestore.instance.collection('posts').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const Text('Loading...');
+            return new Container(
+              decoration: new BoxDecoration(color: Colors.white70),
+              child:new Column(
+                  children: [
+                    ondarFrontPost(snapshot.data.documents[0]['heading']),
+                    ondarFrontPost(snapshot.data.documents[1]['heading']),
+                    ondarFrontPost(snapshot.data.documents[2]['heading']),
+
+                  ]
+              ),
+            );
+          }
+      );
   }
 
   Widget ondarHeader() {
@@ -146,8 +160,10 @@ class _OndarState extends State<OndarFront> {
   Widget ondarFrontPost(String txt) {
     return new Padding(
       padding: const EdgeInsets.all(15.0),
+    child: new GestureDetector(
+      onTap: (){_setCurrentPost('post');},
       child: new Container(
-        padding: new EdgeInsets.only(top: 10.0),
+        padding: new EdgeInsets.only(top: 5.0),
         decoration: new BoxDecoration(
             color: Colors.orangeAccent,
             borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
@@ -170,22 +186,21 @@ class _OndarState extends State<OndarFront> {
                   child: new ImageIcon(
                       new AssetImage("assets/logo-mount.png"),
                       color: null,
-                      size: 35.0), //Logo
+                      size: 25.0), //Logo
 
                 ),
               ),
-              new GestureDetector(
-                  onTap: (){_setCurrentPost('post');},
-                  child: new Container(
-                    margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
+              new Container(
+                    margin: new EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 10.0),
                     child: new Text(txt, style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22.0,
-                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 18.0,
+                      color: Colors.black45,
                     ),)
                 ),
-              ),
+
             ]
+          ),
         ),
       ),
     );
@@ -194,46 +209,46 @@ class _OndarState extends State<OndarFront> {
   Widget ondarFrontPostFull(String txt) {
     return new Padding(
       padding: const EdgeInsets.all(15.0),
-      child: new Container(
-        padding: new EdgeInsets.only(top: 10.0),
-        decoration: new BoxDecoration(
-            color: Colors.orangeAccent,
-            borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
-        height: MediaQuery
-            .of(context)
-            .size
-            .height * 0.3,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width * 0.8,
-        child: new Row(
-            children: [
-              new Container(
-                margin: new EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 10.0),
-                child: new IconTheme(
-                  data: new IconThemeData(
-                    color: null,
-                  ), //IconThemeData
-                  child: new ImageIcon(
-                      new AssetImage("assets/logo-mount.png"),
+      child: new GestureDetector(
+        onTap: (){_setCurrentPost('list');},
+        child: new Container(
+          padding: new EdgeInsets.only(top: 10.0),
+          decoration: new BoxDecoration(
+              color: Colors.orangeAccent,
+              borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.3,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width * 0.8,
+          child: new Row(
+              children: [
+                new Container(
+                  margin: new EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 10.0),
+                  child: new IconTheme(
+                    data: new IconThemeData(
                       color: null,
-                      size: 35.0), //Logo
+                    ), //IconThemeData
+                    child: new ImageIcon(
+                        new AssetImage("assets/logo-mount.png"),
+                        color: null,
+                        size: 35.0), //Logo
 
+                  ),
                 ),
-              ),
-              new GestureDetector(
-                onTap: (){_setCurrentPost('list');},
-                child: new Container(
-                    margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
-                    child: new Text(txt, style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22.0,
-                      color: Colors.blueGrey,
-                    ),)
+                new Container(
+                  margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
+                  child: new Text(txt, style: new TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22.0,
+                    color: Colors.blueGrey,
+                  ),)
                 ),
-              ),
-            ]
+              ]
+          ),
         ),
       ),
     );
