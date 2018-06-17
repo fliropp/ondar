@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import './router.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+import './components/buttons.dart';
+import './components/post.dart';
 
 void main() => runApp(new Ondar());
 
@@ -31,10 +32,12 @@ class OndarFront extends StatefulWidget {
 
 class _OndarState extends State<OndarFront> {
   String _currentPostId = null;
+  int _currentFBIdx = null;
 
-  void _setCurrentPost(String cpid) {
+  void _setViewAndIndex(String view, int idx) {
     setState(() {
-      _currentPostId = cpid;
+      _currentPostId = view;
+      _currentFBIdx = idx;
     });
   }
 
@@ -53,6 +56,8 @@ class _OndarState extends State<OndarFront> {
     );
   }
 
+  /** WIDGETS **/
+
   Widget ondarTop(){
     return new Container(
       decoration: new BoxDecoration(
@@ -65,7 +70,7 @@ class _OndarState extends State<OndarFront> {
         child: new Column(
             children: [
               ondarHeader(),
-              ondarButtons(),
+              ondarButtons(context),
             ]
         ),
       ),
@@ -74,42 +79,10 @@ class _OndarState extends State<OndarFront> {
 
   Widget ondarBottom() {
     if(_currentPostId == 'post') {
-      return new Container(
-        decoration: new BoxDecoration(color: Colors.white70),
-        child:new Column(
-            children: [
-              ondarFrontPostFull('route #1 - full post'),
-
-            ]
-        ),
-      );
+      return showSinglePost();
     } else {
-        //return new Container(
-        //    decoration: new BoxDecoration(color: Colors.white70),
-        //    child:multiplePosts(),
-        //);
-      return multiplePosts();
+      return showMultiplePosts();
     }
-  }
-
-  Widget multiplePosts() {
-    return new StreamBuilder(
-          stream: Firestore.instance.collection('posts').snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Text('Loading...');
-            return new Container(
-              decoration: new BoxDecoration(color: Colors.white70),
-              child:new Column(
-                  children: [
-                    ondarFrontPost(snapshot.data.documents[0]['heading']),
-                    ondarFrontPost(snapshot.data.documents[1]['heading']),
-                    ondarFrontPost(snapshot.data.documents[2]['heading']),
-
-                  ]
-              ),
-            );
-          }
-      );
   }
 
   Widget ondarHeader() {
@@ -123,133 +96,67 @@ class _OndarState extends State<OndarFront> {
     );
   }
 
-  Widget ondarButtons() {
-    return new Container(
-      margin: const EdgeInsets.only(top:270.0, bottom:30.0),
-      decoration: new BoxDecoration(color: Color(0xFFFFFF)),
-      width: MediaQuery.of(context).size.width * 0.7,
-      height: MediaQuery.of(context).size.height * 0.05,
-      child:Center(
-        child: new Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _button('ondarMap'),
-              _button('ondarMap1'),
-              _button('ondarMap2'),
-              _button('ondarMap3'),
-              _button('ondarAbout'),
-            ]
-        ),
-      ),
+  Widget showSinglePost() {
+    return new StreamBuilder(
+        stream: Firestore.instance.collection('posts').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const Text('Loading...');
+          return new Expanded(
+            //decoration: new BoxDecoration(color: Colors.white70),
+            child:new ListView(
+                scrollDirection: Axis.vertical,
+                children: [
+                  ondarFrontPostFull(snapshot.data.documents[_currentFBIdx]),
+                ]
+            ),
+          );
+        }
     );
   }
 
-  Widget _button(String route) {
-    return new FloatingActionButton(
-      heroTag: route,
-      backgroundColor: Colors.orangeAccent, onPressed: () {
-        Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => ondarButtonsRouter(route)),
-        );
-      }
-    );
+  Widget showMultiplePosts() {
+    return new StreamBuilder(
+          stream: Firestore.instance.collection('posts').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const Text('Loading...');
+            return new Expanded(
+              //decoration: new BoxDecoration(color: Colors.white70),
+              child: ListView(
+                scrollDirection: Axis.vertical,
+                children: [
+                    ondarFrontPostTeaser(snapshot.data.documents[0], 0),
+                    ondarFrontPostTeaser(snapshot.data.documents[1], 1),
+                    ondarFrontPostTeaser(snapshot.data.documents[2], 2),
+                  ]
+            ),
+
+            );
+          }
+      );
   }
 
-  Widget ondarFrontPost(String txt) {
-    return new Padding(
-      padding: const EdgeInsets.all(15.0),
-    child: new GestureDetector(
-      onTap: (){_setCurrentPost('post');},
-      child: new Container(
-        padding: new EdgeInsets.only(top: 5.0),
-        decoration: new BoxDecoration(
-            color: Colors.orangeAccent,
-            borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
-        height: MediaQuery
-            .of(context)
-            .size
-            .height * 0.08,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width * 0.8,
-        child: new Row(
-            children: [
-              new Container(
-                margin: new EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 10.0),
-                child: new IconTheme(
-                  data: new IconThemeData(
-                    color: null,
-                  ), //IconThemeData
-                  child: new ImageIcon(
-                      new AssetImage("assets/logo-mount.png"),
-                      color: null,
-                      size: 25.0), //Logo
 
-                ),
-              ),
-              new Container(
-                    margin: new EdgeInsets.fromLTRB(30.0, 0.0, 0.0, 10.0),
-                    child: new Text(txt, style: new TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18.0,
-                      color: Colors.black45,
-                    ),)
-                ),
 
-            ]
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget ondarFrontPostFull(String txt) {
+  Widget ondarFrontPostTeaser(DocumentSnapshot fb_entry, int idx) {
     return new Padding(
       padding: const EdgeInsets.all(15.0),
       child: new GestureDetector(
-        onTap: (){_setCurrentPost('list');},
-        child: new Container(
-          padding: new EdgeInsets.only(top: 10.0),
-          decoration: new BoxDecoration(
-              color: Colors.orangeAccent,
-              borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
-          height: MediaQuery
-              .of(context)
-              .size
-              .height * 0.3,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width * 0.8,
-          child: new Row(
-              children: [
-                new Container(
-                  margin: new EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 10.0),
-                  child: new IconTheme(
-                    data: new IconThemeData(
-                      color: null,
-                    ), //IconThemeData
-                    child: new ImageIcon(
-                        new AssetImage("assets/logo-mount.png"),
-                        color: null,
-                        size: 35.0), //Logo
-
-                  ),
-                ),
-                new Container(
-                  margin: new EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 10.0),
-                  child: new Text(txt, style: new TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22.0,
-                    color: Colors.blueGrey,
-                  ),)
-                ),
-              ]
-          ),
+        onTap: (){
+          _setViewAndIndex('post', idx);
+          },
+        child: frontPostTeaser(fb_entry, context)
         ),
+      );
+  }
+
+  Widget ondarFrontPostFull(DocumentSnapshot post) {
+    return new Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: new GestureDetector(
+        onTap: (){
+          _setViewAndIndex('list', null);
+        },
+        child: frontPostFull(post, context)
       ),
     );
   }

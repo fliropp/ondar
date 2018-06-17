@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './views/ondarAbout.dart';
-import './views/ondarMap.dart';
+import '../views/ondarAbout.dart';
+import '../views/ondarMap.dart';
 
 Widget ondarButtonsRouter(String route){
   switch(route) {
@@ -8,5 +8,7 @@ Widget ondarButtonsRouter(String route){
       return new OndarAbout();
     case('ondarMap'):
       return new OndarMap();
+    default:
+      return null;
   }
 }
