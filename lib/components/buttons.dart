@@ -6,9 +6,9 @@ Widget _button(String route, BuildContext context) {
   return new FloatingActionButton(
       heroTag: route,
       backgroundColor: Colors.orangeAccent, onPressed: () {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => ondarButtonsRouter(route)),
+        Navigator.push(
+          context,
+          new MaterialPageRoute(builder: (context) => ondarButtonsRouter(route)),
     );
   }
   );
@@ -26,7 +26,7 @@ Widget ondarButtons(BuildContext context) {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _button('ondarMap', context),
-            _button('ondarMap1', context),
+            _button('ondarWrite', context),
             _button('ondarMap2', context),
             _button('ondarMap3', context),
             _button('ondarAbout', context),

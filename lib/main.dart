@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import './components/buttons.dart';
 import './components/post.dart';
 
@@ -125,8 +124,8 @@ class _OndarState extends State<OndarFront> {
                 scrollDirection: Axis.vertical,
                 children: [
                     ondarFrontPostTeaser(snapshot.data.documents[0], 0),
-                    ondarFrontPostTeaser(snapshot.data.documents[1], 1),
-                    ondarFrontPostTeaser(snapshot.data.documents[2], 2),
+                    ondarFrontPostTeaser(snapshot.data.documents[2], 1),
+                    ondarFrontPostTeaser(snapshot.data.documents[3], 2),
                   ]
             ),
 

@@ -133,7 +133,7 @@ Widget frontPostFull(DocumentSnapshot post, BuildContext context) {
                   child: new ImageIcon(
                       new AssetImage("assets/logo-mount.png"),
                       color: null,
-                      size: 35.0), //Logo
+                      size: 25.0), //Logo
                 ),
               ),
               new Container(
