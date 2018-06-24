@@ -117,21 +117,34 @@ class _OndarState extends State<OndarFront> {
     return new StreamBuilder(
           stream: Firestore.instance.collection('posts').snapshots(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Text('Loading...');
+            //if (!snapshot.hasData) return const Text('Loading...');
+            if (!snapshot.hasData) return CircularProgressIndicator();
+
             return new Expanded(
+                child:ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: snapshot.data.documents.length,
+                  //itemExtent: 25.0,
+                  itemBuilder: (context, index) {
+                    return ondarFrontPostTeaser(snapshot.data.documents[index], index);
+                  }
+            ),
+            );
+          }
               //decoration: new BoxDecoration(color: Colors.white70),
-              child: ListView(
+              /*child: ListView(
                 scrollDirection: Axis.vertical,
                 children: [
                     ondarFrontPostTeaser(snapshot.data.documents[0], 0),
-                    ondarFrontPostTeaser(snapshot.data.documents[2], 1),
-                    ondarFrontPostTeaser(snapshot.data.documents[3], 2),
+                    ondarFrontPostTeaser(snapshot.data.documents[1], 1),
+                    ondarFrontPostTeaser(snapshot.data.documents[2], 2),
                   ]
-            ),
+            ),*/
 
-            );
-          }
-      );
+    );
+
+
+
   }
 
 
